@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfume Shop — How the App Works</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#1A1512',
+            charcoal: '#2C2420',
+            stone: '#F7F2EB',
+            parchment: '#EDE4D8',
+            champagne: '#C4A574',
+            gold: '#A8895A',
+            sage: '#6B7F6A',
+            blush: '#D4A59A',
+            mist: '#F0EBE3',
+          },
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root {
+      --ink: #1A1512;
+      --champagne: #C4A574;
+      --gold: #A8895A;
+      --sage: #6B7F6A;
+      --stone: #F7F2EB;
+      --parchment: #EDE4D8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--stone);
+      color: var(--ink);
+    }
+
+    .bg-atmosphere {
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(196, 165, 116, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 0%, rgba(107, 127, 106, 0.12), transparent 45%),
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(212, 165, 154, 0.1), transparent 40%),
+        linear-gradient(180deg, #F7F2EB 0%, #F0EBE3 40%, #EDE4D8 100%);
+    }
+
+    .hero-grain {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    .section-card {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(168, 137, 90, 0.18);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 20px 50px -24px rgba(26, 21, 18, 0.18);
+    }
+
+    .nav-pill {
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-pill:hover, .nav-pill.active {
+      background: var(--ink);
+      color: #F7F2EB;
+    }
+
+    .phone-frame {
+      background: linear-gradient(160deg, #2C2420 0%, #1A1512 100%);
+      box-shadow: 0 25px 50px -20px rgba(26, 21, 18, 0.45);
+    }
+
+    .status-chip {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .tab-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(196, 165, 116, 0.12);
+      color: var(--gold);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeUp 0.6s ease both; }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+
+    @media print {
+      .no-print { display: none !important; }
+      .section-card { break-inside: avoid; box-shadow: none; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body class="bg-atmosphere min-h-screen">
+
+  <!-- Sticky nav -->
+  <nav class="no-print sticky top-0 z-50 border-b border-champagne/20 bg-stone/85 backdrop-blur-md">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-full border border-champagne/40 bg-gradient-to-br from-champagne/30 to-sage/20"></div>
+        <span class="font-display text-xl font-semibold tracking-wide text-ink">Perfume Shop</span>
+        <span class="hidden text-xs uppercase tracking-[0.2em] text-gold sm:inline">App Guide</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5 text-xs font-medium">
+        <a href="#what" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">What it is</a>
+        <a href="#navigate" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">Navigate</a>
+        <a href="#browse" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">Browse</a>
+        <a href="#order" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">Order</a>
+        <a href="#track" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">Track</a>
+        <a href="#admin" class="nav-pill rounded-md px-3 py-1.5 text-charcoal/80">For the owner</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="what" class="relative overflow-hidden">
+    <div class="hero-grain pointer-events-none absolute inset-0"></div>
+    <div class="relative mx-auto max-w-6xl px-5 pb-16 pt-14 md:pt-20">
+      <p class="animate-in text-xs font-semibold uppercase tracking-[0.28em] text-gold">Baghdad · Arabic · Mobile</p>
+      <h1 class="animate-in delay-1 mt-4 max-w-3xl font-display text-5xl font-semibold leading-[1.1] text-ink md:text-6xl">
+        How the perfume shop<br />
+        <span class="italic text-charcoal/70">app works</span>
+      </h1>
+      <p class="animate-in delay-2 mt-6 max-w-2xl text-lg leading-relaxed text-charcoal/75">
+        A simple guide for browsing perfumes, saving favorites, placing cash-on-delivery orders in Baghdad,
+        and managing the shop from your phone.
+      </p>
+
+      <div class="animate-in delay-3 mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Where</p>
+          <p class="mt-2 font-display text-2xl font-semibold">Baghdad only</p>
+          <p class="mt-1 text-sm text-charcoal/65">Delivery inside the city · prices in IQD</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Language</p>
+          <p class="mt-2 font-display text-2xl font-semibold">Arabic</p>
+          <p class="mt-1 text-sm text-charcoal/65">Right-to-left · designed for phones</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Payment</p>
+          <p class="mt-2 font-display text-2xl font-semibold">Cash on delivery</p>
+          <p class="mt-1 text-sm text-charcoal/65">Pay when the order arrives</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Sign-in</p>
+          <p class="mt-2 font-display text-2xl font-semibold">Google account</p>
+          <p class="mt-1 text-sm text-charcoal/65">Browse freely · sign in to order</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl space-y-16 px-5 pb-24">
+
+    <!-- Who is it for -->
+    <section>
+      <div class="mb-6">
+        <p class="status-chip text-gold">Who uses it</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">Two sides of the shop</h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class="section-card rounded-3xl p-7">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-champagne/15 text-gold">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
+          </div>
+          <h3 class="font-display text-2xl font-semibold">Customers</h3>
+          <p class="mt-2 text-charcoal/70">Browse the catalog, filter by scent and season, save favorites, fill a basket, and place an order with a delivery pin on the map.</p>
+          <ul class="mt-5 space-y-2 text-sm text-charcoal/75">
+            <li class="flex gap-2"><span class="text-champagne">•</span> Guests can look around and build a basket</li>
+            <li class="flex gap-2"><span class="text-champagne">•</span> Sign in with Google when ready to buy</li>
+            <li class="flex gap-2"><span class="text-champagne">•</span> Track the order until it is delivered</li>
+          </ul>
+        </div>
+        <div class="section-card rounded-3xl p-7">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blush/20 text-blush">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+          </div>
+          <h3 class="font-display text-2xl font-semibold">Shop owner (admin)</h3>
+          <p class="mt-2 text-charcoal/70">A separate admin area on the phone to manage orders, update the catalog, adjust stock and prices, and control what customers see.</p>
+          <ul class="mt-5 space-y-2 text-sm text-charcoal/75">
+            <li class="flex gap-2"><span class="text-blush">•</span> Get a Telegram message for every new order</li>
+            <li class="flex gap-2"><span class="text-blush">•</span> Advance status: preparing → on the way → delivered</li>
+            <li class="flex gap-2"><span class="text-blush">•</span> See the saved delivery pin; optionally call or WhatsApp the customer if needed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigate -->
+    <section id="navigate">
+      <div class="mb-6">
+        <p class="status-chip text-gold">Getting around</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">How to navigate</h2>
+        <p class="mt-2 max-w-2xl text-charcoal/70">Five tabs at the bottom of the screen — always visible on the phone.</p>
+      </div>
+
+      <div class="grid gap-5 lg:grid-cols-5">
+        <div class="section-card rounded-2xl p-5">
+          <div class="tab-icon mb-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold">Home</h3>
+          <p class="mt-2 text-sm text-charcoal/70">Categories, filters, perfume grid, featured reviews, and contact.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <div class="tab-icon mb-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold">Favorites</h3>
+          <p class="mt-2 text-sm text-charcoal/70">Perfumes you saved. Works for guests; syncs when you sign in.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <div class="tab-icon mb-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 7h15l-1.5 9H8L6 7zm0 0L5 4H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold">Basket</h3>
+          <p class="mt-2 text-sm text-charcoal/70">Your cart with a badge showing how many items. Start checkout here.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <div class="tab-icon mb-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold">My Orders</h3>
+          <p class="mt-2 text-sm text-charcoal/70">Active orders with a progress tracker, plus past order history.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <div class="tab-icon mb-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold">Account</h3>
+          <p class="mt-2 text-sm text-charcoal/70">Name, phone, default delivery location. Sign in or out. Delete account.</p>
+        </div>
+      </div>
+
+      <!-- Phone mock navigation -->
+      <div class="section-card mt-5 overflow-hidden rounded-3xl">
+        <div class="grid md:grid-cols-2">
+          <div class="p-7 md:p-10">
+            <p class="status-chip text-gold">On every screen</p>
+            <h3 class="mt-2 font-display text-2xl font-semibold">Bottom tab bar</h3>
+            <p class="mt-3 text-charcoal/70">Switch between Home, Favorites, Basket, My Orders, and Account with one tap. If you are not signed in and open Orders or Account, the app asks you to sign in with Google — then brings you back.</p>
+            <ul class="mt-6 space-y-3 text-sm text-charcoal/75">
+              <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-stone">1</span> Basket shows a count badge when you have items</li>
+              <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-stone">2</span> Guests keep favorites and basket on the phone until login</li>
+              <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-stone">3</span> After Google sign-in, guest basket merges with your account</li>
+            </ul>
+          </div>
+          <div class="flex items-center justify-center bg-gradient-to-br from-parchment/80 to-mist p-8 md:p-10">
+            <div class="phone-frame w-56 rounded-[2rem] p-3">
+              <div class="rounded-[1.4rem] bg-stone px-3 pb-3 pt-4">
+                <div class="mb-4 h-2 w-16 mx-auto rounded-full bg-ink/10"></div>
+                <div class="space-y-2 rounded-xl bg-white/80 p-3">
+                  <div class="h-20 rounded-lg bg-parchment"></div>
+                  <div class="h-2.5 w-3/4 rounded bg-ink/10"></div>
+                  <div class="h-2 w-1/2 rounded bg-ink/8"></div>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <div class="h-24 rounded-lg bg-white/80 p-2"><div class="h-12 rounded bg-parchment"></div><div class="mt-2 h-2 w-3/4 rounded bg-ink/10"></div></div>
+                  <div class="h-24 rounded-lg bg-white/80 p-2"><div class="h-12 rounded bg-parchment"></div><div class="mt-2 h-2 w-3/4 rounded bg-ink/10"></div></div>
+                </div>
+                <div class="mt-4 flex items-center justify-between rounded-2xl bg-ink px-2 py-2.5 text-[9px] text-stone/90">
+                  <span class="flex flex-col items-center gap-0.5 text-champagne"><span>⌂</span>Home</span>
+                  <span class="flex flex-col items-center gap-0.5 opacity-60"><span>♡</span>Fav</span>
+                  <span class="relative flex flex-col items-center gap-0.5 opacity-60"><span>BAG</span><span class="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-champagne text-[7px] text-ink font-bold">2</span></span>
+                  <span class="flex flex-col items-center gap-0.5 opacity-60"><span>☰</span>Orders</span>
+                  <span class="flex flex-col items-center gap-0.5 opacity-60"><span>●</span>Me</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Browse -->
+    <section id="browse">
+      <div class="mb-6">
+        <p class="status-chip text-gold">Discover</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">Browse &amp; choose a perfume</h2>
+      </div>
+
+      <div class="section-card rounded-3xl p-6 md:p-8">
+        <h3 class="font-display text-2xl font-semibold">Home screen flow</h3>
+        <div class="mermaid mt-4">
+flowchart LR
+  A["Open Home"] --> B["Use filters<br/>or tap a category"]
+  B --> C["See perfume cards"]
+  C --> D{"What next?"}
+  D --> E["♡ Favorite"]
+  D --> F["Add to basket<br/>pick size"]
+  D --> G["Open perfume<br/>full details"]
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-5 lg:grid-cols-2">
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <h3 class="font-display text-2xl font-semibold">Find what you like</h3>
+          <ol class="mt-5 space-y-4 text-sm text-charcoal/75">
+            <li class="flex gap-3">
+              <span class="step-num text-2xl font-semibold text-champagne leading-none">1</span>
+              <div>
+                <p class="font-medium text-ink">Filters under the header</p>
+                <p class="mt-1">Gender, season, scent family, concentration, and brand. You can combine them. Active filters show as chips you can remove.</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-num text-2xl font-semibold text-champagne leading-none">2</span>
+              <div>
+                <p class="font-medium text-ink">Category tiles</p>
+                <p class="mt-1">Curated collections from the shop (e.g. gifts, oud, summer). Tap to browse that set.</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-num text-2xl font-semibold text-champagne leading-none">3</span>
+              <div>
+                <p class="font-medium text-ink">Two-column perfume grid</p>
+                <p class="mt-1">Each card shows image, name, “from” price for sample and full size, rating (if any), favorite, and basket. Scroll and load more.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <h3 class="font-display text-2xl font-semibold">On a perfume page</h3>
+          <ul class="mt-5 space-y-3 text-sm text-charcoal/75">
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Photo gallery and full details</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Choose <strong>Sample</strong> or <strong>Full</strong>, then pick a size</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Sold-out sizes are greyed out and cannot be selected</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Sticky bar at the bottom: price, favorite, and Add</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Add stays disabled until type and size are chosen</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Customer reviews appear below</li>
+          </ul>
+          <div class="mt-6 rounded-xl bg-parchment/70 p-4 text-sm text-charcoal/75">
+            <p class="font-medium text-ink">Quick add from a card</p>
+            <p class="mt-1">Tapping the basket icon on a card opens a bottom sheet to pick sample/full and size — same rules as the perfume page.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-4 sm:grid-cols-3">
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Out of stock</p>
+          <p class="mt-2 text-sm text-charcoal/75">Fully sold-out perfumes show a badge, grey image, and disabled basket. You can still favorite them. They appear last in the list.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Favorites</p>
+          <p class="mt-2 text-sm text-charcoal/75">Heart icon on cards and the perfume page. No success toast — it just toggles. Find them all under the Favorites tab.</p>
+        </div>
+        <div class="section-card rounded-2xl p-5">
+          <p class="status-chip text-gold">Reviews on Home</p>
+          <p class="mt-2 text-sm text-charcoal/75">Featured reviews appear near the bottom of Home. Contact section is shown for now as information only.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order -->
+    <section id="order">
+      <div class="mb-6">
+        <p class="status-chip text-gold">Buying</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">How to place an order</h2>
+        <p class="mt-2 max-w-2xl text-charcoal/70">Two steps: review the basket, then confirm delivery details on the map.</p>
+      </div>
+
+      <div class="section-card rounded-3xl p-6 md:p-8">
+        <div class="mermaid">
+flowchart LR
+  A["Add items<br/>to basket"] --> B["Open Basket"]
+  B --> C{"Signed in?"}
+  C -->|No| D["Sign in with Google"]
+  D --> E["Basket merges"]
+  C -->|Yes| F["Confirm basket"]
+  E --> F
+  F --> G["Pin location<br/>on map"]
+  G --> H["Enter phone"]
+  H --> I["Place order<br/>cash on delivery"]
+  I --> J["See order<br/>in My Orders"]
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-2">
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-ink font-display text-xl font-semibold text-champagne">1</span>
+            <h3 class="font-display text-2xl font-semibold">Basket</h3>
+          </div>
+          <ul class="mt-5 space-y-3 text-sm text-charcoal/75">
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Change quantity or remove items (max 5 of the same size)</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Prices and stock are checked when you open the basket</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Sold-out lines are disabled — remove them before ordering</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Continue to checkout when everything looks right</li>
+          </ul>
+        </div>
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-ink font-display text-xl font-semibold text-champagne">2</span>
+            <h3 class="font-display text-2xl font-semibold">Confirm &amp; pay later</h3>
+          </div>
+          <ul class="mt-5 space-y-3 text-sm text-charcoal/75">
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Drop a pin on the map, or tap to use your <strong>current location</strong></li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Saved location from Account can be reused; you can still move the pin</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Must be inside <strong>Baghdad</strong> — outside locations are rejected</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Iraqi mobile number: <code class="rounded bg-parchment px-1.5 py-0.5 text-xs">07XXXXXXXXX</code></li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Optional landmark note (e.g. “near the pharmacy”) so the shop can find you</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>See subtotal + fixed delivery fee + total</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-champagne"></span>Place order — pay in cash when it arrives</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-4 sm:grid-cols-3">
+        <div class="rounded-2xl border border-ink/10 bg-white/60 p-5">
+          <p class="font-display text-lg font-semibold">Order number</p>
+          <p class="mt-2 text-sm text-charcoal/70">Short number like <strong>#1042</strong> so you and the shop can refer to it easily.</p>
+        </div>
+        <div class="rounded-2xl border border-ink/10 bg-white/60 p-5">
+          <p class="font-display text-lg font-semibold">Active order limit</p>
+          <p class="mt-2 text-sm text-charcoal/70">Up to <strong>2 active orders</strong> at a time (waiting, preparing, or on the way).</p>
+        </div>
+        <div class="rounded-2xl border border-ink/10 bg-white/60 p-5">
+          <p class="font-display text-lg font-semibold">If something sells out</p>
+          <p class="mt-2 text-sm text-charcoal/70">The order fails with a clear message — nothing is charged; fix the basket and try again.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Track -->
+    <section id="track">
+      <div class="mb-6">
+        <p class="status-chip text-gold">After you order</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">Track, cancel &amp; review</h2>
+      </div>
+
+      <div class="section-card rounded-3xl p-6 md:p-10">
+        <h3 class="font-display text-2xl font-semibold text-center">Order progress</h3>
+        <p class="mx-auto mt-2 max-w-lg text-center text-sm text-charcoal/65">My Orders shows a progress tracker. Active orders refresh automatically so you see updates.</p>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-2 md:gap-3">
+          <div class="rounded-2xl bg-ink px-4 py-3 text-center text-stone min-w-[100px]">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-champagne">Step 1</p>
+            <p class="font-display text-lg font-semibold">Received</p>
+          </div>
+          <span class="text-champagne text-xl">→</span>
+          <div class="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center min-w-[100px]">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-gold">Step 2</p>
+            <p class="font-display text-lg font-semibold">Preparing</p>
+          </div>
+          <span class="text-champagne text-xl">→</span>
+          <div class="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center min-w-[100px]">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-gold">Step 3</p>
+            <p class="font-display text-lg font-semibold">On the way</p>
+          </div>
+          <span class="text-champagne text-xl">→</span>
+          <div class="rounded-2xl border border-sage/40 bg-sage/10 px-4 py-3 text-center min-w-[100px]">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-sage">Done</p>
+            <p class="font-display text-lg font-semibold">Delivered</p>
+          </div>
+        </div>
+
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          <div class="rounded-xl bg-parchment/60 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gold">Cancel</p>
+            <p class="mt-2 text-sm text-charcoal/75">You can cancel only while the order is still <strong>Received</strong> — before the shop starts preparing it.</p>
+          </div>
+          <div class="rounded-xl bg-parchment/60 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gold">History</p>
+            <p class="mt-2 text-sm text-charcoal/75">Delivered and cancelled orders stay in My Orders so you can look them up later.</p>
+          </div>
+          <div class="rounded-xl bg-parchment/60 p-5">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gold">Leave a review</p>
+            <p class="mt-2 text-sm text-charcoal/75">After delivery, rate the perfume (1–5 stars, optional short text). One review per perfume; you can edit or delete yours.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card mt-5 rounded-3xl p-6 md:p-8">
+        <h3 class="font-display text-2xl font-semibold">Your account (user info)</h3>
+        <p class="mt-2 max-w-2xl text-sm text-charcoal/70">Save your details once so checkout is faster. You can always change them when placing an order.</p>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-xl border border-ink/10 p-4">
+            <p class="font-medium">Email</p>
+            <p class="mt-1 text-sm text-charcoal/65">From Google — read only</p>
+          </div>
+          <div class="rounded-xl border border-ink/10 p-4">
+            <p class="font-medium">Name &amp; phone</p>
+            <p class="mt-1 text-sm text-charcoal/65">Iraqi mobile <code class="rounded bg-parchment px-1 text-xs">07XXXXXXXXX</code></p>
+          </div>
+          <div class="rounded-xl border border-ink/10 p-4">
+            <p class="font-medium">Delivery location</p>
+            <p class="mt-1 text-sm text-charcoal/65">Pin on the map, use current location, or move the pin · optional landmark</p>
+          </div>
+          <div class="rounded-xl border border-ink/10 p-4">
+            <p class="font-medium">Delete account</p>
+            <p class="mt-1 text-sm text-charcoal/65">Removes personal data (with confirmation)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin -->
+    <section id="admin">
+      <div class="mb-6">
+        <p class="status-chip text-gold">Shop owner</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">How the owner runs the shop</h2>
+        <p class="mt-2 max-w-2xl text-charcoal/70">A mobile-friendly admin area — built for one owner managing orders and the catalog from a phone.</p>
+      </div>
+
+      <div class="section-card rounded-3xl p-6 md:p-8">
+        <h3 class="font-display text-2xl font-semibold">When a new order arrives</h3>
+        <div class="mermaid mt-4">
+flowchart LR
+  A["Customer places<br/>order"] --> B["Telegram alert<br/>to the owner"]
+  B --> C["Open the order<br/>in admin"]
+  C --> D["Open map<br/>saved location"]
+  C --> E["Optional: Call / WhatsApp<br/>only if you need to talk"]
+  C --> F["Update status<br/>until Delivered"]
+        </div>
+      </div>
+
+      <!-- Clear order actions -->
+      <div class="section-card mt-5 rounded-3xl p-6 md:p-8">
+        <h3 class="font-display text-2xl font-semibold">Buttons on each order — what they do</h3>
+        <p class="mt-2 max-w-2xl text-sm text-charcoal/70">
+          The customer’s <strong>delivery location is already saved</strong> — on their Account page and again on the order at checkout.
+          The owner does <strong>not</strong> need WhatsApp or a call to get the address.
+          Call and WhatsApp are only for <strong>talking to the customer when needed</strong> (optional).
+        </p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-2xl border border-ink/10 bg-white/70 p-5">
+            <p class="status-chip text-gold">Call · optional</p>
+            <p class="mt-2 font-display text-xl font-semibold">Phone the customer</p>
+            <p class="mt-2 text-sm text-charcoal/70">Only when you need to talk — e.g. they don’t answer the door, or you need a quick clarification. Not used to collect the address.</p>
+          </div>
+          <div class="rounded-2xl border border-ink/10 bg-white/70 p-5">
+            <p class="status-chip text-gold">WhatsApp · optional</p>
+            <p class="mt-2 font-display text-xl font-semibold">Chat the customer when needed</p>
+            <p class="mt-2 text-sm text-charcoal/70">Same idea as Call — a quick chat if something comes up during delivery. Location is already on the order; WhatsApp is not for asking where they live.</p>
+          </div>
+          <div class="rounded-2xl border border-ink/10 bg-white/70 p-5">
+            <p class="status-chip text-gold">Open map</p>
+            <p class="mt-2 font-display text-xl font-semibold">See the saved delivery pin</p>
+            <p class="mt-2 text-sm text-charcoal/70">Shows the location the customer already set (Account and/or checkout). Use this to navigate to them.</p>
+          </div>
+          <div class="rounded-2xl border border-ink/10 bg-white/70 p-5">
+            <p class="status-chip text-gold">Send location</p>
+            <p class="mt-2 font-display text-xl font-semibold">Share that pin with someone</p>
+            <p class="mt-2 text-sm text-charcoal/70">If another person will deliver, the owner can share the already-saved pin. There is no delivery-person login in the app.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-5 lg:grid-cols-3">
+        <div class="section-card rounded-3xl p-6">
+          <p class="status-chip text-gold">Dashboard</p>
+          <h3 class="mt-2 font-display text-xl font-semibold">At a glance</h3>
+          <ul class="mt-4 space-y-2 text-sm text-charcoal/75">
+            <li>• How many new orders</li>
+            <li>• Today’s and month’s revenue (delivered)</li>
+            <li>• Low-stock items (3 or fewer left)</li>
+          </ul>
+        </div>
+        <div class="section-card rounded-3xl p-6">
+          <p class="status-chip text-gold">Orders</p>
+          <h3 class="mt-2 font-display text-xl font-semibold">Fulfill day to day</h3>
+          <ul class="mt-4 space-y-2 text-sm text-charcoal/75">
+            <li>• Tabs by status with counts</li>
+            <li>• Search by order # or phone</li>
+            <li>• Advance status with one button</li>
+            <li>• Cancel with a reason (restores stock)</li>
+            <li>• Contact customer + view / share address (see above)</li>
+            <li>• Block a problematic customer</li>
+          </ul>
+        </div>
+        <div class="section-card rounded-3xl p-6">
+          <p class="status-chip text-gold">Catalog</p>
+          <h3 class="mt-2 font-display text-xl font-semibold">Keep the shop updated</h3>
+          <ul class="mt-4 space-y-2 text-sm text-charcoal/75">
+            <li>• Add / edit perfumes and sizes</li>
+            <li>• Quick stock and price edits</li>
+            <li>• Upload up to 5 photos per perfume</li>
+            <li>• Hide a perfume instead of deleting</li>
+            <li>• Manage brands, scent families, categories</li>
+            <li>• Set the fixed delivery fee</li>
+            <li>• Hide or feature reviews on Home</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- What to expect -->
+    <section>
+      <div class="mb-6">
+        <p class="status-chip text-gold">Expectations</p>
+        <h2 class="mt-2 font-display text-3xl font-semibold md:text-4xl">What this first version includes</h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <div class="flex items-center gap-3">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-sage/15 text-sage text-lg">✓</span>
+            <h3 class="font-display text-2xl font-semibold">Included</h3>
+          </div>
+          <ul class="mt-5 space-y-2.5 text-sm text-charcoal/75">
+            <li>Full shopping experience on the phone (Arabic)</li>
+            <li>Filters, categories, favorites, basket</li>
+            <li>Google sign-in and cash-on-delivery checkout</li>
+            <li>Map delivery pin limited to Baghdad</li>
+            <li>Order tracking and cancel while Received</li>
+            <li>Reviews after delivery</li>
+            <li>Owner admin + Telegram alerts</li>
+          </ul>
+        </div>
+        <div class="section-card rounded-3xl p-6 md:p-8">
+          <div class="flex items-center gap-3">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blush/20 text-blush text-lg">→</span>
+            <h3 class="font-display text-2xl font-semibold">Not in the first version</h3>
+          </div>
+          <ul class="mt-5 space-y-2.5 text-sm text-charcoal/75">
+            <li>Online card / wallet payment</li>
+            <li>Delivery outside Baghdad</li>
+            <li>Search box and sorting options</li>
+            <li>SMS codes or push notifications to customers</li>
+            <li>A separate delivery-person app or auto-assign to a driver</li>
+            <li>Returns after delivery</li>
+            <li>Editing an order after it is placed (cancel and reorder instead)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-champagne/25 pt-10 text-center">
+      <p class="font-display text-2xl font-semibold text-ink">Perfume Shop — Baghdad</p>
+      <p class="mt-2 text-sm text-charcoal/60">Customer &amp; owner guide · how to use the app</p>
+      <p class="no-print mt-6 text-xs text-charcoal/45">Open in a browser · Print / Save as PDF for the client</p>
+    </footer>
+  </main>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#F7F2EB',
+        primaryTextColor: '#1A1512',
+        primaryBorderColor: '#C4A574',
+        lineColor: '#A8895A',
+        secondaryColor: '#EDE4D8',
+        tertiaryColor: '#F0EBE3',
+        fontFamily: 'DM Sans, system-ui, sans-serif',
+        fontSize: '14px',
+        nodeTextColor: '#1A1512',
+        mainBkg: '#FFFFFF',
+        clusterBkg: 'rgba(247, 242, 235, 0.6)',
+        clusterBorder: '#C4A574',
+        titleColor: '#1A1512',
+        edgeLabelBackground: '#F7F2EB',
+      },
+      flowchart: { curve: 'basis', padding: 16, htmlLabels: true },
+      securityLevel: 'loose',
+    });
+
+    const links = document.querySelectorAll('.nav-pill');
+    const sections = [...links].map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id));
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    sections.forEach(s => io.observe(s));
+  </script>
+</body>
+</html>
